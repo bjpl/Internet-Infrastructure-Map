@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knowledge Base Integration Demo</title>
+
+  <!-- Knowledge Base Styles -->
+  <link rel="stylesheet" href="../src/styles/knowledgeBase.css">
+  <!-- Highlight.js Theme -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #0a0a14;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    .demo-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .demo-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .demo-header h1 {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #00ffcc, #ffcc00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .demo-header p {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .demo-section {
+      margin-bottom: 80px;
+    }
+
+    .demo-section h2 {
+      font-size: 32px;
+      margin-bottom: 24px;
+      color: #00ffcc;
+    }
+
+    .demo-section p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 24px;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      margin-top: 32px;
+    }
+
+    .demo-card {
+      background: linear-gradient(135deg, rgba(10, 10, 20, 0.95), rgba(20, 20, 40, 0.9));
+      border: 2px solid rgba(0, 255, 204, 0.2);
+      border-radius: 12px;
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .demo-card:hover {
+      border-color: #00ffcc;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(0, 255, 204, 0.2);
+    }
+
+    .demo-card h3 {
+      font-size: 20px;
+      margin-bottom: 12px;
+      color: #00ffcc;
+    }
+
+    .demo-card p {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6);
+      margin: 0;
+    }
+
+    .demo-button {
+      display: inline-block;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #00ffcc, #00ccaa);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-right: 12px;
+      margin-bottom: 12px;
+    }
+
+    .demo-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 255, 204, 0.3);
+    }
+
+    .demo-button.secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .feature-showcase {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 32px;
+      margin-top: 32px;
+    }
+
+    .code-example {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 16px;
+      overflow-x: auto;
+    }
+
+    .code-example pre {
+      margin: 0;
+      font-family: 'Fira Code', 'Consolas', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin: 32px 0;
+    }
+
+    .stat-card {
+      background: rgba(0, 255, 204, 0.05);
+      border: 1px solid rgba(0, 255, 204, 0.2);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 800;
+      color: #00ffcc;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-container">
+    <div class="demo-header">
+      <h1>Knowledge Base Integration</h1>
+      <p>Interactive educational overlays for the Live Internet Infrastructure Map</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="article-count">16</div>
+        <div class="stat-label">Articles</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">8</div>
+        <div class="stat-label">Categories</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">4</div>
+        <div class="stat-label">Learning Tours</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">5</div>
+        <div class="stat-label">Display Modes</div>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="demo-section">
+      <h2>Features</h2>
+      <p>
+        The Knowledge Base Integration provides a seamless educational experience
+        integrated directly into the visualization. Learn about internet infrastructure
+        through interactive overlays, guided tours, and comprehensive articles.
+      </p>
+
+      <div class="demo-grid">
+        <div class="demo-card" onclick="showTooltipDemo()">
+          <h3>Smart Tooltips</h3>
+          <p>Context-aware tooltips that appear on hover, providing quick facts and "Learn More" options.</p>
+        </div>
+
+        <div class="demo-card" onclick="showSidebarDemo()">
+          <h3>Sidebar Articles</h3>
+          <p>Persistent side panel with full articles, search, and related topics navigation.</p>
+        </div>
+
+        <div class="demo-card" onclick="showFullscreenDemo()">
+          <h3>Fullscreen Reading</h3>
+          <p>Immersive reading experience with table of contents and distraction-free layout.</p>
+        </div>
+
+        <div class="demo-card" onclick="showSearchDemo()">
+          <h3>Full-text Search</h3>
+          <p>Powerful search with filters, autocomplete, and relevance ranking.</p>
+        </div>
+
+        <div class="demo-card" onclick="showTourDemo()">
+          <h3>Learning Tours</h3>
+          <p>Guided tours that highlight specific elements while explaining concepts step-by-step.</p>
+        </div>
+
+        <div class="demo-card" onclick="showBookmarksDemo()">
+          <h3>Bookmarks & History</h3>
+          <p>Save articles for later and navigate your reading history.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo Buttons -->
+    <div class="demo-section">
+      <h2>Try It Out</h2>
+      <p>Click the buttons below to see the knowledge base features in action:</p>
+
+      <button class="demo-button" onclick="showTooltipDemo()">Show Tooltip</button>
+      <button class="demo-button" onclick="showSidebarDemo()">Open Sidebar</button>
+      <button class="demo-button" onclick="showFullscreenDemo()">Fullscreen Article</button>
+      <button class="demo-button secondary" onclick="showSearchDemo()">Search KB</button>
+      <button class="demo-button secondary" onclick="showTourDemo()">Start Tour</button>
+    </div>
+
+    <!-- Implementation -->
+    <div class="demo-section">
+      <h2>Implementation</h2>
+      <p>
+        Integrating the knowledge base into your visualization is straightforward.
+        Here's a minimal example:
+      </p>
+
+      <div class="code-example">
+        <pre><code class="language-javascript">import knowledgeBaseService from './services/knowledgeBaseService.js';
+import EducationalOverlay from './components/EducationalOverlay.js';
+import KnowledgeBaseIntegration from './integrations/knowledgeBaseIntegration.js';
+
+// Initialize the knowledge base
+await knowledgeBaseService.initialize();
+
+// Create the integration
+const kbIntegration = new KnowledgeBaseIntegration(globe);
+await kbIntegration.initialize();
+
+// Show an article when user clicks a cable
+globe.onArcClick(arc => {
+  kbIntegration.showArticle('internet-architecture/00-index', 'sidebar');
+});
+
+// Start a guided tour
+kbIntegration.startTour('submarine-cables');</code></pre>
+      </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="demo-section">
+      <h2>Knowledge Base Categories</h2>
+      <div class="demo-grid" id="categories-grid">
+        <!-- Populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Components (Module Type) -->
+  <script type="module">
+    import knowledgeBaseService from '../src/services/knowledgeBaseService.js';
+    import EducationalOverlay from '../src/components/EducationalOverlay.js';
+    import LearningTour from '../src/components/LearningTour.js';
+    import KnowledgeSearch from '../src/components/KnowledgeSearch.js';
+
+    let overlay, tour, search;
+
+    // Initialize
+    async function init() {
+      try {
+        // Initialize KB service
+        await knowledgeBaseService.initialize();
+
+        // Create overlay
+        overlay = new EducationalOverlay();
+
+        // Create tour (mock globe)
+        const mockGlobe = {
+          pointOfView: (pov, duration) => console.log('Camera move:', pov)
+        };
+        tour = new LearningTour(mockGlobe, overlay);
+
+        // Update stats
+        document.getElementById('article-count').textContent = knowledgeBaseService.articles.size;
+
+        // Populate categories
+        populateCategories();
+
+        console.log('KB Demo initialized');
+      } catch (error) {
+        console.error('Initialization error:', error);
+      }
+    }
+
+    function populateCategories() {
+      const categories = knowledgeBaseService.getAllCategories();
+      const grid = document.getElementById('categories-grid');
+
+      grid.innerHTML = categories.map(cat => `
+        <div class="demo-card" onclick="window.showCategoryArticles('${cat.id}')">
+          <h3>${cat.icon} ${cat.title}</h3>
+          <p>${cat.articleCount} articles • ${cat.difficulty}</p>
+        </div>
+      `).join('');
+    }
+
+    // Demo functions
+    window.showTooltipDemo = async function() {
+      await overlay.showTooltip('cable', {
+        id: 'demo-cable',
+        name: 'MAREA Cable',
+        capacity: 200
+      }, { x: window.innerWidth / 2, y: 200 });
+    };
+
+    window.showSidebarDemo = async function() {
+      const articles = Array.from(knowledgeBaseService.articles.values());
+      if (articles.length > 0) {
+        await overlay.showSidebar(articles[0].id);
+      }
+    };
+
+    window.showFullscreenDemo = async function() {
+      const articles = Array.from(knowledgeBaseService.articles.values());
+      if (articles.length > 0) {
+        await overlay.showFullscreen(articles[0].id);
+      }
+    };
+
+    window.showSearchDemo = async function() {
+      const articles = Array.from(knowledgeBaseService.articles.values());
+      if (articles.length > 0) {
+        await overlay.showSidebar(articles[0].id);
+        overlay.switchTab('search');
+      }
+    };
+
+    window.showTourDemo = function() {
+      tour.start('submarine-cables');
+    };
+
+    window.showBookmarksDemo = async function() {
+      const articles = Array.from(knowledgeBaseService.articles.values());
+      if (articles.length > 0) {
+        await overlay.showSidebar(articles[0].id);
+        overlay.toggleBookmark();
+        alert('Article bookmarked! Bookmarks are saved in localStorage.');
+      }
+    };
+
+    window.showCategoryArticles = async function(categoryId) {
+      const articles = knowledgeBaseService.getArticlesByCategory(categoryId);
+      if (articles.length > 0) {
+        await overlay.showSidebar(articles[0].id);
+      }
+    };
+
+    // Start initialization
+    init();
+  </script>
+
+  <!-- Syntax Highlighting -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>
