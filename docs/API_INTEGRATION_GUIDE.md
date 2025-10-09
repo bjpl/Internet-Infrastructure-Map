@@ -226,7 +226,12 @@ export default {
       '/api/cloudflare': {
         target: 'https://api.cloudflare.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/cloudflare/, '')
+        rewrite: (path) => path.replace(/^\/api\/cloudflare/, '/client/v4/radar')
+      },
+      '/api/telegeography': {
+        target: 'https://www.submarinecablemap.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/telegeography/, '/api/v3')
       }
     }
   }

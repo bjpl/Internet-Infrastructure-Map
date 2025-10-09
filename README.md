@@ -42,6 +42,11 @@ npm install
 
 # Run immediately (works without API keys!)
 npm run dev
+
+# Other useful commands:
+npm run build      # Build for production
+npm run preview    # Preview production build locally
+npm run fetch-data # Fetch latest data from APIs (requires API keys)
 \`\`\`
 
 **Optional:** Add API keys to \`.env\` for 100% live data (see [docs/API_INTEGRATION_GUIDE.md](docs/API_INTEGRATION_GUIDE.md))
