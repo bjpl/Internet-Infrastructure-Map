@@ -55,11 +55,22 @@ npm run fetch-data # Fetch latest data from APIs (requires API keys)
 
 ## 📚 Documentation
 
+### Quick Start
+- **[Getting Started Guide](docs/GETTING_STARTED.md)** - Choose your learning path
+- **[Quick Reference](docs/reference/QUICK_REFERENCE.md)** - One-page cheat sheet
+- **[Developer Cheat Sheet](docs/reference/DEVELOPER_CHEATSHEET.md)** - Dev quick reference
+
+### Comprehensive Guides
+- **[API Complete Guide](docs/guides/API_COMPLETE_GUIDE.md)** - All API documentation (consolidated)
+- **[Knowledge Base Guide](docs/guides/KNOWLEDGE_BASE_GUIDE.md)** - Educational features
+- **[KB Advanced Guide](docs/guides/KB_ADVANCED_GUIDE.md)** - Advanced customization
+- **[Data Quality Guide](docs/guides/DATA_QUALITY_GUIDE.md)** - Quality monitoring (consolidated)
+
+### Technical Reference
+- **[Architecture](docs/architecture/README.md)** - System design & patterns
+- **[Error Handling](docs/api/ERROR_HANDLING.md)** - API troubleshooting
 - **[Implementation Complete](docs/IMPLEMENTATION_COMPLETE.md)** - Full feature summary
-- **[API Integration Guide](docs/API_INTEGRATION_GUIDE.md)** - Live data setup
-- **[Knowledge Base Guide](docs/KNOWLEDGE_BASE_INTEGRATION.md)** - Educational features
-- **[Architecture](docs/architecture/README.md)** - System design
-- **[Data Freshness Guide](docs/DATA_FRESHNESS_GUIDE.md)** - Quality monitoring
+- **[Documentation Index](docs/INDEX.md)** - Complete catalog
 
 ---
 
@@ -107,13 +118,18 @@ See [docs/architecture/](docs/architecture/) for diagrams.
 
 ## 🤝 Contributing
 
-Areas for help:
-1. More live data sources
-2. Knowledge base expansion
-3. Mobile optimization
-4. Accessibility improvements
+We welcome contributions! Areas for help:
+1. More live data sources (Hurricane Electric BGP, RIPE Atlas)
+2. Knowledge base expansion (more articles and tours)
+3. Mobile optimization (React Native app)
+4. Accessibility improvements (WCAG 2.1 AA)
+5. Internationalization (i18n support)
 
-See `CONTRIBUTING.md` for guidelines.
+**Get Started:**
+- Read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines
+- Check [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for community standards
+- Review [SECURITY.md](SECURITY.md) for security policy
+- See [CHANGELOG.md](CHANGELOG.md) for version history
 
 ---
 

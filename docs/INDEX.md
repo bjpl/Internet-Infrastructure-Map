@@ -12,6 +12,12 @@ Last Updated: October 8, 2025 | Version: 2.0.0
 - **[Navigation Guide](./NAVIGATION.md)** - How to find what you need
 - **[Implementation Summary](./IMPLEMENTATION_COMPLETE.md)** - Project overview and accomplishments
 
+**📌 New in Oct 2025:**
+- **[Quick Reference](./reference/QUICK_REFERENCE.md)** - One-page cheat sheet
+- **[Developer Cheat Sheet](./reference/DEVELOPER_CHEATSHEET.md)** - Dev quick reference
+- **[Consolidated Guides](./guides/)** - All major guides unified
+- **[Error Handling](./api/ERROR_HANDLING.md)** - API troubleshooting
+
 ---
 
 ## Documentation by Category
@@ -45,44 +51,50 @@ Last Updated: October 8, 2025 | Version: 2.0.0
 
 ---
 
-### 3. Live API Integration
+### 3. Live API Integration ⭐ CONSOLIDATED
 
 | Document | Description | Audience | Time | Difficulty | Last Updated |
 |----------|-------------|----------|------|------------|--------------|
-| [API Integration Guide](./API_INTEGRATION_GUIDE.md) | Complete API setup and usage | Developers | 20 min | Intermediate | Oct 7, 2025 |
-| [API Service Guide](./API_SERVICE_GUIDE.md) | Service layer documentation | Developers | 15 min | Intermediate | Oct 7, 2025 |
-| [Live API Implementation](./LIVE_API_IMPLEMENTATION_SUMMARY.md) | Implementation summary | Developers | 15 min | Intermediate | Oct 7, 2025 |
-| [Live API Usage Examples](./LIVE_API_USAGE_EXAMPLES.md) | Code examples and recipes | Developers | 10 min | Beginner | Oct 7, 2025 |
+| **[API Complete Guide](./guides/API_COMPLETE_GUIDE.md)** ⭐ | **All API documentation (consolidated)** | Developers | 30 min | Intermediate | **Oct 8, 2025** |
+| [Error Handling](./api/ERROR_HANDLING.md) 🆕 | API troubleshooting reference | Developers | 15 min | Intermediate | Oct 8, 2025 |
+| ~~[API Integration Guide](./API_INTEGRATION_GUIDE.md)~~ | ⚠️ Deprecated - Use API Complete Guide | - | - | - | Archived |
+| ~~[API Service Guide](./API_SERVICE_GUIDE.md)~~ | ⚠️ Deprecated - Use API Complete Guide | - | - | - | Archived |
+| ~~[Live API Usage Examples](./LIVE_API_USAGE_EXAMPLES.md)~~ | ⚠️ Deprecated - Use API Complete Guide | - | - | - | Archived |
+| ~~[Quick Start: Live APIs](./QUICK_START_LIVE_APIS.md)~~ | ⚠️ Deprecated - Use API Complete Guide | - | - | - | Archived |
+| [Live API Implementation](./LIVE_API_IMPLEMENTATION_SUMMARY.md) | Implementation summary (supplementary) | Developers | 15 min | Intermediate | Oct 7, 2025 |
 
-**Tags:** `api`, `integration`, `live-data`, `intermediate`
+**Tags:** `api`, `integration`, `live-data`, `intermediate`, `consolidated`
 
 **Prerequisites:** JavaScript/ES6, Promises/async-await, HTTP/REST concepts
 
 ---
 
-### 4. Knowledge Base
+### 4. Knowledge Base ⭐ CONSOLIDATED
 
 | Document | Description | Audience | Time | Difficulty | Last Updated |
 |----------|-------------|----------|------|------------|--------------|
-| [Knowledge Base Integration](./KNOWLEDGE_BASE_INTEGRATION.md) | Complete KB documentation | Developers, Educators | 30 min | Intermediate | Oct 7, 2025 |
-| [KB Quick Start](./KB_QUICK_START.md) | 5-minute setup guide | Developers | 5 min | Beginner | Oct 7, 2025 |
-| [KB Implementation](./KB_IMPLEMENTATION_SUMMARY.md) | Technical implementation details | Developers | 20 min | Intermediate | Oct 7, 2025 |
+| **[Knowledge Base Guide](./guides/KNOWLEDGE_BASE_GUIDE.md)** ⭐ | **Main KB guide (consolidated)** | Developers, Educators | 25 min | Intermediate | **Oct 8, 2025** |
+| **[KB Advanced Guide](./guides/KB_ADVANCED_GUIDE.md)** 🆕 | **Advanced customization** | Developers | 30 min | Advanced | **Oct 8, 2025** |
+| ~~[Knowledge Base Integration](./KNOWLEDGE_BASE_INTEGRATION.md)~~ | ⚠️ Deprecated - Use KB Guide | - | - | - | Archived |
+| ~~[KB Quick Start](./KB_QUICK_START.md)~~ | ⚠️ Deprecated - Use KB Guide | - | - | - | Archived |
+| ~~[KB Implementation](./KB_IMPLEMENTATION_SUMMARY.md)~~ | ⚠️ Deleted (90% redundant) | - | - | - | Deleted |
 
-**Tags:** `knowledge-base`, `educational`, `content`, `intermediate`
+**Tags:** `knowledge-base`, `educational`, `content`, `intermediate`, `consolidated`
 
 **Prerequisites:** Markdown, JSON, basic search concepts
 
 ---
 
-### 5. Data Quality & Freshness
+### 5. Data Quality & Freshness ⭐ CONSOLIDATED
 
 | Document | Description | Audience | Time | Difficulty | Last Updated |
 |----------|-------------|----------|------|------------|--------------|
-| [Data Freshness Guide](./DATA_FRESHNESS_GUIDE.md) | Complete freshness system | Developers | 25 min | Intermediate | Oct 7, 2025 |
-| [Data Freshness Quick Ref](./DATA_FRESHNESS_QUICK_REF.md) | Quick reference card | Developers | 5 min | Beginner | Oct 7, 2025 |
-| [Data Freshness README](./DATA_FRESHNESS_README.md) | System overview | Everyone | 10 min | Beginner | Oct 7, 2025 |
+| **[Data Quality Guide](./guides/DATA_QUALITY_GUIDE.md)** ⭐ | **Complete quality system (consolidated)** | Developers | 35 min | Intermediate | **Oct 8, 2025** |
+| ~~[Data Freshness Guide](./DATA_FRESHNESS_GUIDE.md)~~ | ⚠️ Deprecated - Use Data Quality Guide | - | - | - | Archived |
+| ~~[Data Freshness Quick Ref](./DATA_FRESHNESS_QUICK_REF.md)~~ | ⚠️ Deprecated - Use Data Quality Guide | - | - | - | Archived |
+| ~~[Data Freshness README](./DATA_FRESHNESS_README.md)~~ | ⚠️ Deprecated - Use Data Quality Guide | - | - | - | Archived |
 
-**Tags:** `data-quality`, `monitoring`, `freshness`, `intermediate`
+**Tags:** `data-quality`, `monitoring`, `freshness`, `intermediate`, `consolidated`
 
 **Prerequisites:** Understanding of caching, TTL, and confidence scoring
 
@@ -169,12 +181,12 @@ Last Updated: October 8, 2025 | Version: 2.0.0
 
 **Recommended Path:**
 1. [Getting Started](./GETTING_STARTED.md) - Choose developer path
-2. [API Integration Guide](./API_INTEGRATION_GUIDE.md) - Setup APIs
-3. [Knowledge Base Integration](./KNOWLEDGE_BASE_INTEGRATION.md) - Add educational features
+2. **[API Complete Guide](./guides/API_COMPLETE_GUIDE.md)** ⭐ - Setup APIs (consolidated)
+3. **[Knowledge Base Guide](./guides/KNOWLEDGE_BASE_GUIDE.md)** ⭐ - Add educational features
 4. [Data Flow Diagrams](./architecture/data-flow-diagrams.md) - Understand system flow
-5. [API Integration Patterns](./architecture/api-integration-patterns.md) - Best practices
+5. **[Developer Cheat Sheet](./reference/DEVELOPER_CHEATSHEET.md)** 🆕 - Quick reference
 
-**Total Time:** ~2 hours
+**Total Time:** ~1.5 hours (improved with consolidation)
 
 ---
 
@@ -216,29 +228,40 @@ Last Updated: October 8, 2025 | Version: 2.0.0
 
 ## Documentation by Topic
 
-### API Integration
-- [API Integration Guide](./API_INTEGRATION_GUIDE.md)
-- [API Service Guide](./API_SERVICE_GUIDE.md)
-- [Live API Implementation](./LIVE_API_IMPLEMENTATION_SUMMARY.md)
-- [API Integration Patterns](./architecture/api-integration-patterns.md)
-- [API Integration Research](./research/api-integration-research.md)
+### API Integration ⭐ CONSOLIDATED
+- **[API Complete Guide](./guides/API_COMPLETE_GUIDE.md)** ⭐ - All-in-one API reference
+- [Error Handling](./api/ERROR_HANDLING.md) 🆕 - Troubleshooting guide
+- [Live API Implementation](./LIVE_API_IMPLEMENTATION_SUMMARY.md) - Implementation details
+- [API Integration Research](./research/api-integration-research.md) - Research & evaluation
+- ~~API Integration Guide~~ (deprecated)
+- ~~API Service Guide~~ (deprecated)
+- ~~Live API Usage Examples~~ (deprecated)
+- ~~Quick Start: Live APIs~~ (deprecated)
 
-### Knowledge Base
-- [Knowledge Base Integration](./KNOWLEDGE_BASE_INTEGRATION.md)
-- [KB Quick Start](./KB_QUICK_START.md)
-- [KB Implementation](./KB_IMPLEMENTATION_SUMMARY.md)
-- [Knowledge Base Mapping](./research/knowledge-base-mapping.md)
+### Knowledge Base ⭐ CONSOLIDATED
+- **[Knowledge Base Guide](./guides/KNOWLEDGE_BASE_GUIDE.md)** ⭐ - Main KB guide
+- **[KB Advanced Guide](./guides/KB_ADVANCED_GUIDE.md)** 🆕 - Advanced customization
+- [Knowledge Base Mapping](./research/knowledge-base-mapping.md) - Content structure
+- ~~Knowledge Base Integration~~ (deprecated)
+- ~~KB Quick Start~~ (deprecated)
+- ~~KB Implementation~~ (deleted - redundant)
 
 ### Architecture
 - [Architecture Overview](./architecture/README.md)
 - [Integration Architecture](./architecture/integration-architecture.md)
 - [Data Flow Diagrams](./architecture/data-flow-diagrams.md)
 - [Implementation Guide](./architecture/implementation-guide.md)
+- [API Integration Patterns](./architecture/api-integration-patterns.md)
 
-### Data Quality
-- [Data Freshness Guide](./DATA_FRESHNESS_GUIDE.md)
-- [Data Freshness Quick Ref](./DATA_FRESHNESS_QUICK_REF.md)
-- [Data Freshness README](./DATA_FRESHNESS_README.md)
+### Data Quality ⭐ CONSOLIDATED
+- **[Data Quality Guide](./guides/DATA_QUALITY_GUIDE.md)** ⭐ - Complete quality system
+- ~~Data Freshness Guide~~ (deprecated)
+- ~~Data Freshness Quick Ref~~ (deprecated)
+- ~~Data Freshness README~~ (deprecated)
+
+### Quick Reference 🆕
+- [Quick Reference Card](./reference/QUICK_REFERENCE.md) - One-page overview
+- [Developer Cheat Sheet](./reference/DEVELOPER_CHEATSHEET.md) - Dev quick ref
 
 ---
 
@@ -278,10 +301,10 @@ Last Updated: October 8, 2025 | Version: 2.0.0
 → [README](../README.md) → [Getting Started](./GETTING_STARTED.md)
 
 **...integrate live APIs**
-→ [API Integration Guide](./API_INTEGRATION_GUIDE.md) → [Live API Usage Examples](./LIVE_API_USAGE_EXAMPLES.md)
+→ **[API Complete Guide](./guides/API_COMPLETE_GUIDE.md)** ⭐
 
 **...add educational content**
-→ [Knowledge Base Integration](./KNOWLEDGE_BASE_INTEGRATION.md) → [KB Quick Start](./KB_QUICK_START.md)
+→ **[Knowledge Base Guide](./guides/KNOWLEDGE_BASE_GUIDE.md)** ⭐
 
 **...understand the architecture**
 → [Architecture Overview](./architecture/README.md) → [Data Flow Diagrams](./architecture/data-flow-diagrams.md)
@@ -290,7 +313,10 @@ Last Updated: October 8, 2025 | Version: 2.0.0
 → [Deployment Guide](./DEPLOYMENT.md)
 
 **...monitor data quality**
-→ [Data Freshness Guide](./DATA_FRESHNESS_GUIDE.md)
+→ **[Data Quality Guide](./guides/DATA_QUALITY_GUIDE.md)** ⭐
+
+**...get a quick reference**
+→ **[Quick Reference Card](./reference/QUICK_REFERENCE.md)** 🆕
 
 **...contribute code**
 → [Implementation Complete](./IMPLEMENTATION_COMPLETE.md) → [Service Layer Summary](./SERVICE_LAYER_SUMMARY.md)
@@ -317,11 +343,14 @@ Last Updated: October 8, 2025 | Version: 2.0.0
 
 ## Document Statistics
 
-**Total Documents:** 52+
+**Total Documents:** 52+ (46 active after consolidation)
 **Total Categories:** 9
-**Average Read Time:** 15 minutes
-**Total Documentation Size:** ~150+ pages
-**Last Major Update:** October 8, 2025
+**Consolidated Guides:** 4 (API, KB Main, KB Advanced, Data Quality)
+**New Files:** 7 (Quick Ref, Dev Cheat Sheet, Error Handling, etc.)
+**Deprecated Files:** 11 (marked with redirect notices)
+**Average Read Time:** 12 minutes (improved with consolidation)
+**Total Documentation Size:** ~180+ pages
+**Last Major Update:** October 8, 2025 (Documentation Consolidation v2.0)
 
 ---
 
