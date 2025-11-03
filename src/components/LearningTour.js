@@ -1,3 +1,5 @@
+import DOMPurify from 'dompurify';
+
 /**
  * Learning Tour Component
  *
@@ -331,7 +333,7 @@ class LearningTour {
   createTourUI() {
     const tourContainer = document.createElement('div');
     tourContainer.className = 'learning-tour-container hidden';
-    tourContainer.innerHTML = `
+    tourContainer.innerHTML = DOMPurify.sanitize(`
       <div class="tour-overlay"></div>
       <div class="tour-modal">
         <div class="tour-header">
@@ -377,7 +379,7 @@ class LearningTour {
       </div>
 
       <div class="tour-highlight-overlay"></div>
-    `;
+    `);
 
     document.body.appendChild(tourContainer);
     this.tourContainer = tourContainer;
@@ -451,7 +453,7 @@ class LearningTour {
 
     // Update UI
     this.tourContainer.querySelector('.tour-step-title').textContent = step.title;
-    this.tourContainer.querySelector('.tour-step-content').innerHTML = step.content;
+    this.tourContainer.querySelector('.tour-step-content').innerHTML = DOMPurify.sanitize(step.content);
 
     // Update progress
     const progress = ((stepIndex + 1) / this.currentTour.steps.length) * 100;
@@ -468,12 +470,12 @@ class LearningTour {
     if (stepIndex === this.currentTour.steps.length - 1) {
       nextBtn.textContent = 'Finish';
     } else {
-      nextBtn.innerHTML = `
+      nextBtn.innerHTML = DOMPurify.sanitize(`
         Next
         <svg width="16" height="16" fill="currentColor">
           <path d="M5 2l7 6-7 6" stroke="currentColor" stroke-width="2" fill="none"/>
         </svg>
-      `;
+      `);
     }
 
     // Execute step action

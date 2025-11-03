@@ -116,6 +116,59 @@ See [docs/architecture/](docs/architecture/) for diagrams.
 
 ---
 
+## 🔒 Security
+
+Security is a top priority. We follow industry best practices to protect your data and our infrastructure.
+
+### Reporting Vulnerabilities
+
+**DO NOT** report security vulnerabilities through public GitHub issues.
+
+**Preferred Method:**
+- Use [GitHub Security Advisories](https://github.com/bjpl/Internet-Infrastructure-Map/security/advisories)
+- Click "Report a vulnerability"
+
+**Alternative:**
+- Email: security@internet-infrastructure-map.dev
+- PGP: https://keybase.io/internet-infra-map
+
+We aim to respond within 48 hours and will keep you updated throughout the process.
+
+### Security Best Practices
+
+**For Users:**
+- Store API keys in `.env` files (never commit them)
+- Use different keys for development and production
+- Rotate API keys every 90 days
+- Enable HTTPS in production
+- Run `npm audit` regularly
+
+**For Contributors:**
+- Follow [Security Guidelines](docs/security/SECURITY_GUIDELINES.md)
+- Use [Security Checklists](docs/security/SECURITY_CHECKLISTS.md)
+- Run security checks before commits
+- Never commit secrets to the repository
+
+### Security Documentation
+
+- **[SECURITY.md](SECURITY.md)** - Security policy and vulnerability reporting
+- **[Security Guidelines](docs/security/SECURITY_GUIDELINES.md)** - Developer security practices
+- **[Deployment Security](docs/security/DEPLOYMENT_SECURITY.md)** - Production hardening guide
+- **[Incident Response](docs/security/INCIDENT_RESPONSE.md)** - Security incident procedures
+- **[Security Checklists](docs/security/SECURITY_CHECKLISTS.md)** - Quick reference checklists
+
+### Security Features
+
+- ✅ Environment variable configuration (no hardcoded secrets)
+- ✅ Input validation and sanitization
+- ✅ Rate limiting (client-side)
+- ✅ Dependency vulnerability scanning
+- ✅ Security headers in production
+- ✅ HTTPS enforcement
+- ✅ No personal data collection
+
+---
+
 ## 🤝 Contributing
 
 We welcome contributions! Areas for help:

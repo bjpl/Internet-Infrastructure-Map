@@ -1,0 +1,297 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run security scans daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  dependency-audit:
+    name: NPM Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit
+        id: audit
+        run: |
+          npm audit --json > audit-results.json || true
+          cat audit-results.json
+
+          # Check for high/critical vulnerabilities
+          HIGH_COUNT=$(jq '.metadata.vulnerabilities.high // 0' audit-results.json)
+          CRITICAL_COUNT=$(jq '.metadata.vulnerabilities.critical // 0' audit-results.json)
+
+          echo "high_vulns=$HIGH_COUNT" >> $GITHUB_OUTPUT
+          echo "critical_vulns=$CRITICAL_COUNT" >> $GITHUB_OUTPUT
+
+          if [ "$CRITICAL_COUNT" -gt 0 ] || [ "$HIGH_COUNT" -gt 0 ]; then
+            echo "::error::Found $CRITICAL_COUNT critical and $HIGH_COUNT high severity vulnerabilities"
+            exit 1
+          fi
+        continue-on-error: true
+
+      - name: Upload audit results
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-results
+          path: audit-results.json
+          retention-days: 30
+
+      - name: Comment PR with audit results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const audit = JSON.parse(fs.readFileSync('audit-results.json', 'utf8'));
+
+            const { vulnerabilities } = audit.metadata;
+            const total = Object.values(vulnerabilities).reduce((a, b) => a + b, 0);
+
+            const comment = `## 🔒 Security Audit Results
+
+            **Total Vulnerabilities:** ${total}
+            - 🔴 Critical: ${vulnerabilities.critical || 0}
+            - 🟠 High: ${vulnerabilities.high || 0}
+            - 🟡 Moderate: ${vulnerabilities.moderate || 0}
+            - 🟢 Low: ${vulnerabilities.low || 0}
+
+            ${vulnerabilities.critical > 0 || vulnerabilities.high > 0 ? '⚠️ **Action Required:** Critical or High severity vulnerabilities found!' : '✅ No critical or high severity vulnerabilities found.'}
+
+            <details>
+            <summary>View detailed audit results</summary>
+
+            \`\`\`json
+            ${JSON.stringify(audit, null, 2)}
+            \`\`\`
+            </details>`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+      - name: Fail build on vulnerabilities
+        if: steps.audit.outputs.critical_vulns > 0 || steps.audit.outputs.high_vulns > 0
+        run: exit 1
+
+  secret-scanning:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog Secret Scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+
+      - name: GitLeaks Secret Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+  sast-codeql:
+    name: CodeQL SAST Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['javascript']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended,security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"
+
+  sast-semgrep:
+    name: Semgrep SAST
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        run: |
+          semgrep scan --config auto --json --output semgrep-results.json || true
+          semgrep scan --config auto --sarif --output semgrep-results.sarif || true
+
+      - name: Upload Semgrep results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: semgrep-results.sarif
+
+      - name: Upload Semgrep results artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semgrep-results
+          path: semgrep-results.json
+          retention-days: 30
+
+  license-compliance:
+    name: License Compliance Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install license checker
+        run: npm install -g license-checker
+
+      - name: Check licenses
+        id: license-check
+        run: |
+          license-checker --json --out licenses.json
+
+          # Check for forbidden licenses
+          FORBIDDEN_LICENSES="GPL-2.0,GPL-3.0,AGPL-1.0,AGPL-3.0"
+
+          if license-checker --failOn "$FORBIDDEN_LICENSES"; then
+            echo "✅ No forbidden licenses found"
+          else
+            echo "::error::Forbidden licenses detected!"
+            exit 1
+          fi
+        continue-on-error: true
+
+      - name: Upload license report
+        uses: actions/upload-artifact@v4
+        with:
+          name: license-report
+          path: licenses.json
+          retention-days: 90
+
+      - name: Comment PR with license summary
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const licenses = JSON.parse(fs.readFileSync('licenses.json', 'utf8'));
+
+            const licenseSummary = {};
+            Object.values(licenses).forEach(pkg => {
+              const license = pkg.licenses || 'Unknown';
+              licenseSummary[license] = (licenseSummary[license] || 0) + 1;
+            });
+
+            const sortedLicenses = Object.entries(licenseSummary)
+              .sort((a, b) => b[1] - a[1])
+              .map(([license, count]) => `- ${license}: ${count} packages`)
+              .join('\n');
+
+            const comment = `## 📜 License Compliance Report
+
+            **Total Packages:** ${Object.keys(licenses).length}
+
+            **License Distribution:**
+            ${sortedLicenses}
+
+            ✅ No forbidden licenses (GPL-2.0, GPL-3.0, AGPL-1.0, AGPL-3.0) detected.
+
+            <details>
+            <summary>View full license report</summary>
+
+            Download the \`license-report\` artifact for detailed information.
+            </details>`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          deny-licenses: GPL-2.0, GPL-3.0, AGPL-1.0, AGPL-3.0
+          comment-summary-in-pr: always
+
+  security-summary:
+    name: Security Summary
+    runs-on: ubuntu-latest
+    needs: [dependency-audit, secret-scanning, sast-codeql, sast-semgrep, license-compliance]
+    if: always()
+    steps:
+      - name: Check overall security status
+        run: |
+          echo "## Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ All security scans completed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Scan Results:" >> $GITHUB_STEP_SUMMARY
+          echo "- Dependency Audit: ${{ needs.dependency-audit.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Secret Scanning: ${{ needs.secret-scanning.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- CodeQL SAST: ${{ needs.sast-codeql.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Semgrep SAST: ${{ needs.sast-semgrep.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- License Compliance: ${{ needs.license-compliance.result }}" >> $GITHUB_STEP_SUMMARY

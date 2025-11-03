@@ -18,6 +18,7 @@ import { DataManager } from './dataManager.js';
 import { GlobeRenderer } from './components/GlobeRenderer.js';
 import { FilterControls } from './components/FilterControls.js';
 import { DataTableManager } from './components/DataTableManager.js';
+import DOMPurify from 'dompurify';
 import { EducationalOverlay } from './components/EducationalOverlay.js';
 
 class UnifiedInfrastructureMap {

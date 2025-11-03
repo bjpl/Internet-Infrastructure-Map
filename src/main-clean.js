@@ -2,6 +2,7 @@ import Globe from 'globe.gl';
 import * as THREE from 'three';
 import * as d3 from 'd3';
 import { DataManager } from './dataManager.js';
+import DOMPurify from 'dompurify';
 // Removed custom cable renderer - using globe.gl paths instead
 
 class CleanInfrastructureMap {
@@ -60,7 +61,7 @@ class CleanInfrastructureMap {
       // Simplify loading screen
       const content = loadingScreen.querySelector('.loading-content');
       if (content) {
-        content.innerHTML = `
+        content.innerHTML = DOMPurify.sanitize(`
           <div style="text-align: center;">
             <div style="
               width: 60px;
@@ -1463,15 +1464,18 @@ class CleanInfrastructureMap {
           );
           
           const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${cable.name || 'Unknown Cable'}</td>
+          const cableName = DOMPurify.sanitize(cable.name || 'Unknown Cable');
+          const loc1 = DOMPurify.sanitize(cable.landing_point_1.location || `${cable.landing_point_1.latitude.toFixed(1)}°, ${cable.landing_point_1.longitude.toFixed(1)}°`);
+          const loc2 = DOMPurify.sanitize(cable.landing_point_2.location || `${cable.landing_point_2.latitude.toFixed(1)}°, ${cable.landing_point_2.longitude.toFixed(1)}°`);
+          row.innerHTML = DOMPurify.sanitize(`
+            <td>${cableName}</td>
             <td>${cable.capacity_tbps ? cable.capacity_tbps.toFixed(1) : 'N/A'}</td>
             <td>${Math.round(distance)}</td>
-            <td>${cable.landing_point_1.location || `${cable.landing_point_1.latitude.toFixed(1)}°, ${cable.landing_point_1.longitude.toFixed(1)}°`}</td>
-            <td>${cable.landing_point_2.location || `${cable.landing_point_2.latitude.toFixed(1)}°, ${cable.landing_point_2.longitude.toFixed(1)}°`}</td>
+            <td>${loc1}</td>
+            <td>${loc2}</td>
             <td class="status-${cable.status || 'active'}">${(cable.status || 'Active').toUpperCase()}</td>
             <td class="accuracy-${cable.data_accuracy === 'live' ? 'live' : 'estimated'}">${cable.data_accuracy === 'live' ? 'Live' : 'Estimated'}</td>
-          `;
+          `);
           tbody.appendChild(row);
         });
       }
@@ -1557,15 +1561,19 @@ class CleanInfrastructureMap {
       // Create rows
       filtered.forEach(dc => {
         const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${dc.city || 'Unknown'}</td>
-          <td>${dc.country || 'Unknown'}</td>
+        const city = DOMPurify.sanitize(dc.city || 'Unknown');
+        const country = DOMPurify.sanitize(dc.country || 'Unknown');
+        const provider = DOMPurify.sanitize(dc.provider || 'N/A');
+        const name = DOMPurify.sanitize(dc.name || 'DC');
+        row.innerHTML = DOMPurify.sanitize(`
+          <td>${city}</td>
+          <td>${country}</td>
           <td><span class="tier-badge tier${dc.tier}">Tier ${dc.tier}</span></td>
-          <td>${dc.provider || 'N/A'}</td>
+          <td>${provider}</td>
           <td>${dc.latitude?.toFixed(4)}, ${dc.longitude?.toFixed(4)}</td>
-          <td>${dc.name || 'DC'}</td>
+          <td>${name}</td>
           <td><span class="status-active">Active</span></td>
-        `;
+        `);
         datacenterTbody.appendChild(row);
       });
     };

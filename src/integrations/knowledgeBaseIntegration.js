@@ -2,6 +2,7 @@ import knowledgeBaseService from '../services/knowledgeBaseService.js';
 import EducationalOverlay from '../components/EducationalOverlay.js';
 import LearningTour from '../components/LearningTour.js';
 import KnowledgeSearch from '../components/KnowledgeSearch.js';
+import DOMPurify from 'dompurify';
 
 /**
  * Knowledge Base Integration
@@ -196,7 +197,7 @@ class KnowledgeBaseIntegration {
     // Add KB section to control panel
     const kbSection = document.createElement('div');
     kbSection.className = 'control-section kb-section';
-    kbSection.innerHTML = `
+    kbSection.innerHTML = DOMPurify.sanitize(`
       <h3 class="section-title">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
           <path d="M3 1h10v2H3z"/>
@@ -237,7 +238,7 @@ class KnowledgeBaseIntegration {
           </button>
         </div>
       </div>
-    `;
+    `);
 
     controlPanel.appendChild(kbSection);
 
@@ -300,7 +301,7 @@ class KnowledgeBaseIntegration {
 
     const modal = document.createElement('div');
     modal.className = 'kb-browse-modal';
-    modal.innerHTML = `
+    modal.innerHTML = DOMPurify.sanitize(`
       <div class="kb-modal-backdrop"></div>
       <div class="kb-modal-container">
         <div class="kb-modal-header">
@@ -320,7 +321,7 @@ class KnowledgeBaseIntegration {
           </div>
         </div>
       </div>
-    `;
+    `);
 
     document.body.appendChild(modal);
 

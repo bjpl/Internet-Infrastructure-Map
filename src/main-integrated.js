@@ -16,6 +16,7 @@
 import * as THREE from 'three';
 import * as d3 from 'd3';
 import gsap from 'gsap';
+import DOMPurify from 'dompurify';
 
 // === ORCHESTRATION & DATA LAYER ===
 // DataOrchestrator replaces the old DataManager with intelligent fallback chains
@@ -28,9 +29,9 @@ import KnowledgeBaseIntegration from './integrations/knowledgeBaseIntegration.js
 import { GlobeRenderer } from './components/GlobeRenderer.js';
 import { FilterControls } from './components/FilterControls.js';
 import { DataTableManager } from './components/DataTableManager.js';
-import { EducationalOverlay } from './components/EducationalOverlay.js';
-import { LearningTour } from './components/LearningTour.js';
-import { KnowledgeSearch } from './components/KnowledgeSearch.js';
+import EducationalOverlay from './components/EducationalOverlay.js';
+import LearningTour from './components/LearningTour.js';
+import KnowledgeSearch from './components/KnowledgeSearch.js';
 
 /**
  * Integrated Infrastructure Map Application

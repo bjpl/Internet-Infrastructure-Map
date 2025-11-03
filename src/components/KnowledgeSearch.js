@@ -1,4 +1,5 @@
 import knowledgeBaseService from '../services/knowledgeBaseService.js';
+import DOMPurify from 'dompurify';
 
 /**
  * Knowledge Search Component
@@ -21,7 +22,7 @@ class KnowledgeSearch {
   createSearchUI() {
     const searchContainer = document.createElement('div');
     searchContainer.className = 'kb-search-widget';
-    searchContainer.innerHTML = `
+    searchContainer.innerHTML = DOMPurify.sanitize(`
       <div class="kb-search-bar">
         <svg class="kb-search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor">
           <circle cx="8" cy="8" r="6" stroke-width="2"/>
@@ -36,7 +37,7 @@ class KnowledgeSearch {
           autocomplete="off"
         />
 
-        <button class="kb-search-clear hidden" aria-label="Clear search">×</button>
+        <button class="kb-search-clear hidden" aria-label="Clear search">&times;</button>
 
         <button class="kb-search-filters" aria-label="Show filters">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
@@ -91,7 +92,7 @@ class KnowledgeSearch {
         </div>
         <ul class="kb-recent-list"></ul>
       </div>
-    `;
+    `);
 
     this.container.appendChild(searchContainer);
     this.searchWidget = searchContainer;
@@ -238,7 +239,7 @@ class KnowledgeSearch {
     const resultsContainer = this.searchWidget.querySelector('.kb-search-results');
 
     if (results.length === 0) {
-      resultsContainer.innerHTML = `
+      resultsContainer.innerHTML = DOMPurify.sanitize(`
         <div class="kb-no-results">
           <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor">
             <circle cx="24" cy="24" r="20" stroke-width="2"/>
@@ -247,20 +248,20 @@ class KnowledgeSearch {
           <p>No results found for "${this.escapeHTML(query)}"</p>
           <p class="kb-no-results-hint">Try different keywords or browse by category</p>
         </div>
-      `;
+      `);
       resultsContainer.classList.remove('hidden');
       this.hideSuggestions();
       return;
     }
 
-    resultsContainer.innerHTML = `
+    resultsContainer.innerHTML = DOMPurify.sanitize(`
       <div class="kb-results-header">
         <span class="kb-results-count">${results.length} result${results.length !== 1 ? 's' : ''}</span>
       </div>
       <ul class="kb-results-list">
         ${results.map(({ article, snippet, score, matches }) => this.renderResultItem(article, snippet, score, matches, query)).join('')}
       </ul>
-    `;
+    `);
 
     resultsContainer.classList.remove('hidden');
     this.hideSuggestions();
@@ -387,11 +388,11 @@ class KnowledgeSearch {
     const list = this.searchWidget.querySelector('.kb-recent-list');
 
     if (this.recentSearches.length === 0) {
-      list.innerHTML = '<li class="kb-recent-empty">No recent searches</li>';
+      list.innerHTML = DOMPurify.sanitize('<li class="kb-recent-empty">No recent searches</li>');
       return;
     }
 
-    list.innerHTML = this.recentSearches.map(search => `
+    list.innerHTML = DOMPurify.sanitize(this.recentSearches.map(search => `
       <li class="kb-recent-item">
         <button class="kb-recent-search">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -401,7 +402,7 @@ class KnowledgeSearch {
           ${this.escapeHTML(search)}
         </button>
       </li>
-    `).join('');
+    `).join(''));
 
     // Add click handlers
     list.querySelectorAll('.kb-recent-search').forEach((btn, index) => {

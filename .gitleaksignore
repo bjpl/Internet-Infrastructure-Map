@@ -1,0 +1,19 @@
+# GitLeaks Ignore File
+# Add false positives here to prevent GitLeaks from flagging them
+
+# Example patterns to ignore:
+# path/to/file.js:123
+# specific-file.md
+
+# Common false positives:
+# Documentation examples
+docs/**/*example*.md
+docs/**/*sample*.md
+
+# Test fixtures with dummy data
+tests/**/*fixture*
+tests/**/*mock*
+
+# Package lock files (high entropy but not secrets)
+package-lock.json
+npm-shrinkwrap.json

@@ -1,0 +1,42 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running pre-push security checks..."
+
+# Run full test suite including security tests
+echo "Running test suite..."
+npm test || {
+  echo "❌ Tests failed. Fix issues before pushing."
+  exit 1
+}
+
+# Run security audit
+echo "Running npm audit..."
+npm audit --audit-level=high || {
+  echo "❌ High or critical vulnerabilities found. Run 'npm audit fix' to resolve."
+  exit 1
+}
+
+# Check for merge conflicts markers
+echo "Checking for merge conflict markers..."
+CONFLICT_MARKERS=$(git diff origin/main...HEAD | grep -E '^(<<<<<<<|=======|>>>>>>>)' || true)
+if [ ! -z "$CONFLICT_MARKERS" ]; then
+  echo "❌ Merge conflict markers found in code!"
+  exit 1
+fi
+
+# Verify no debug code
+echo "Checking for debug code..."
+DEBUG_CODE=$(git diff origin/main...HEAD | grep -iE 'console\.(log|debug|trace)|debugger;|var_dump|print_r' || true)
+if [ ! -z "$DEBUG_CODE" ]; then
+  echo "⚠️  Debug code found in commits:"
+  echo "$DEBUG_CODE"
+  echo "Consider removing debug statements before pushing to production."
+  read -p "Continue anyway? (y/n) " -n 1 -r
+  echo
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    exit 1
+  fi
+fi
+
+echo "✅ Pre-push security checks passed!"

@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import * as d3 from 'd3';
 import gsap from 'gsap';
 import { DataManager } from './dataManager.js';
+import DOMPurify from 'dompurify';
 
 class InternetInfrastructureMap {
   constructor() {
@@ -439,14 +440,15 @@ class InternetInfrastructureMap {
     const content = document.getElementById('info-content');
     
     panel.classList.remove('hidden');
-    content.innerHTML = `
+    const errorMsg = DOMPurify.sanitize(error.message || 'Unknown error');
+    content.innerHTML = DOMPurify.sanitize(`
       <div style="color: #ff3366;">
-        Some data sources are currently unavailable. 
+        Some data sources are currently unavailable.
         Showing cached/estimated data where possible.
         <br><br>
-        Error: ${error.message}
+        Error: ${errorMsg}
       </div>
-    `;
+    `);
   }
   
   onWindowResize() {

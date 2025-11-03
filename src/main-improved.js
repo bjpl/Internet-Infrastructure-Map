@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import * as d3 from 'd3';
 import gsap from 'gsap';
 import { DataManager } from './dataManager.js';
+import DOMPurify from 'dompurify';
 
 class InternetInfrastructureMap {
   constructor() {

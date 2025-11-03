@@ -1,0 +1,110 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      # Check daily for security vulnerabilities, weekly for version updates
+      interval: "daily"
+      time: "03:00"
+      timezone: "America/New_York"
+    open-pull-requests-limit: 10
+
+    # Automatically rebase PRs when they become outdated
+    rebase-strategy: "auto"
+
+    # Group dependency updates
+    groups:
+      # Group all patch updates together
+      patch-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+
+      # Group all minor updates together
+      minor-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+
+      # Development dependencies
+      development-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+
+    # Add labels to PRs
+    labels:
+      - "dependencies"
+      - "automated"
+      - "security"
+
+    # Add reviewers
+    reviewers:
+      - "security-team"
+
+    # Commit message configuration
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+
+    # Pull request branch name prefix
+    pull-request-branch-name:
+      separator: "/"
+
+    # Ignore specific dependencies or versions
+    ignore:
+      # Ignore major version updates for stable packages that require manual testing
+      - dependency-name: "three"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "globe.gl"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "satellite.js"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "d3"
+        update-types: ["version-update:semver-major"]
+      # Allow security updates for all packages
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+    # Allow specific dependencies to update majors
+    allow:
+      - dependency-name: "eslint*"
+      - dependency-name: "prettier"
+      - dependency-name: "@types/*"
+
+    # Increase version requirements for security updates
+    versioning-strategy: increase
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "automated"
+    commit-message:
+      prefix: "chore(ci)"
+    open-pull-requests-limit: 5
+
+  # Enable security updates for Docker if using containers
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "security"
+    commit-message:
+      prefix: "chore(docker)"
+    open-pull-requests-limit: 3

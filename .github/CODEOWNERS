@@ -1,0 +1,41 @@
+# CODEOWNERS - Defines code ownership for automatic review requests
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Repository Owner - Default fallback for all files
+*       @bjpl
+
+# Security-sensitive files require security team review
+/.github/workflows/security.yml       @bjpl
+/.github/dependabot.yml               @bjpl
+/docs/security/                       @bjpl
+.env.example                          @bjpl
+
+# Infrastructure and CI/CD files
+/.github/workflows/                   @bjpl
+/Dockerfile                           @bjpl
+/docker-compose.yml                   @bjpl
+/.husky/                              @bjpl
+
+# Configuration files
+*.config.js                           @bjpl
+*.config.json                         @bjpl
+package.json                          @bjpl
+package-lock.json                     @bjpl
+
+# Source code ownership
+/src/                                 @bjpl
+/tests/                               @bjpl
+
+# Documentation
+/docs/                                @bjpl
+*.md                                  @bjpl
+README.md                             @bjpl
+
+# Database and migrations
+/migrations/                          @bjpl
+/schema/                              @bjpl
+
+# API and contracts
+/api/                                 @bjpl
+/openapi.yml                          @bjpl
+/swagger.json                         @bjpl

@@ -1,0 +1,213 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    branches: [main, develop]
+
+permissions:
+  contents: read
+  pull-requests: write
+  statuses: write
+
+jobs:
+  pr-validation:
+    name: PR Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: PR title validation
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+          requireScope: false
+          subjectPattern: ^[A-Z].+$
+          subjectPatternError: |
+            The subject "{subject}" found in the pull request title "{title}"
+            must start with a capital letter.
+
+      - name: Check PR size
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const additions = pr.additions;
+            const deletions = pr.deletions;
+            const changes = additions + deletions;
+
+            let size = 'small';
+            let color = '0e8a16';
+            let emoji = '✅';
+
+            if (changes > 1000) {
+              size = 'extra-large';
+              color = 'd73a4a';
+              emoji = '🚨';
+              core.warning(`This PR is very large (${changes} changes). Consider breaking it into smaller PRs.`);
+            } else if (changes > 500) {
+              size = 'large';
+              color = 'fbca04';
+              emoji = '⚠️';
+            } else if (changes > 200) {
+              size = 'medium';
+              color = 'dfb317';
+              emoji = '📝';
+            }
+
+            // Add size label
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: [`size/${size}`]
+            });
+
+            // Comment on large PRs
+            if (changes > 500) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `${emoji} **PR Size Alert**\n\nThis PR has **${changes}** line changes (+${additions}/-${deletions}), which is quite large.\n\n**Recommendations:**\n- Consider breaking this into smaller, focused PRs\n- Large PRs take longer to review and are more error-prone\n- Smaller PRs get merged faster and reduce merge conflicts\n\n**If this is unavoidable:**\n- Ensure thorough testing\n- Add detailed description of changes\n- Request review from multiple team members`
+              });
+            }
+
+      - name: Check for required labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: labels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const labelNames = labels.map(label => label.name);
+            const requiredTypes = ['bug', 'feature', 'enhancement', 'documentation', 'security', 'chore'];
+
+            const hasRequiredLabel = requiredTypes.some(type =>
+              labelNames.some(label => label.toLowerCase().includes(type))
+            );
+
+            if (!hasRequiredLabel) {
+              core.warning('PR is missing a type label (bug, feature, enhancement, documentation, security, chore)');
+            }
+
+      - name: Check for linked issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const body = pr.body || '';
+            const issuePattern = /(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#\d+/gi;
+            const hasLinkedIssue = issuePattern.test(body);
+
+            if (!hasLinkedIssue) {
+              core.warning('PR does not link to any issues. Consider linking related issues with "Closes #123" or "Fixes #456"');
+            }
+
+  security-review-required:
+    name: Security Review Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for security-sensitive changes
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const securitySensitivePaths = [
+              /auth/i,
+              /security/i,
+              /\.env/,
+              /config.*secret/i,
+              /password/i,
+              /token/i,
+              /key/i,
+              /credential/i,
+            ];
+
+            const sensitiveFiles = files.filter(file =>
+              securitySensitivePaths.some(pattern => pattern.test(file.filename))
+            );
+
+            if (sensitiveFiles.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: ['security-review-required']
+              });
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `🔒 **Security Review Required**\n\nThis PR modifies security-sensitive files:\n${sensitiveFiles.map(f => `- \`${f.filename}\``).join('\n')}\n\n**Action Required:**\n- Request review from security team\n- Ensure all security best practices are followed\n- Verify no sensitive data is exposed\n- Update security documentation if needed`
+              });
+            }
+
+  changelog-check:
+    name: Changelog Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for changelog update
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const hasChangelog = files.some(file =>
+              file.filename.toLowerCase().includes('changelog')
+            );
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const labels = pr.labels.map(label => label.name);
+            const skipChangelog = labels.includes('skip-changelog') ||
+                                  labels.includes('dependencies') ||
+                                  labels.includes('documentation');
+
+            if (!hasChangelog && !skipChangelog) {
+              core.warning('PR does not update CHANGELOG.md. Add "skip-changelog" label if not needed.');
+            }

@@ -9,6 +9,8 @@
  * - Filter integration
  */
 
+import DOMPurify from 'dompurify';
+
 export class DataTableManager {
   /**
    * @param {Function} getFilteredData - Callback to get filtered data
@@ -119,7 +121,7 @@ export class DataTableManager {
       );
 
       const row = document.createElement('tr');
-      row.innerHTML = `
+      row.innerHTML = DOMPurify.sanitize(`
         <td>${this.escapeHtml(cable.name || 'Unknown Cable')}</td>
         <td>${cable.capacity_tbps ? cable.capacity_tbps.toFixed(1) : 'N/A'}</td>
         <td>${Math.round(distance)}</td>
@@ -127,7 +129,7 @@ export class DataTableManager {
         <td>${this.escapeHtml(cable.landing_point_2.location || `${cable.landing_point_2.latitude.toFixed(1)}°, ${cable.landing_point_2.longitude.toFixed(1)}°`)}</td>
         <td class="status-${cable.status || 'active'}">${(cable.status || 'Active').toUpperCase()}</td>
         <td class="accuracy-${cable.data_accuracy === 'live' ? 'live' : 'estimated'}">${cable.data_accuracy === 'live' ? 'Live' : 'Estimated'}</td>
-      `;
+      `);
       tbody.appendChild(row);
     });
   }
@@ -153,7 +155,7 @@ export class DataTableManager {
     // Create rows
     datacenters.forEach(dc => {
       const row = document.createElement('tr');
-      row.innerHTML = `
+      row.innerHTML = DOMPurify.sanitize(`
         <td>${this.escapeHtml(dc.city || 'Unknown')}</td>
         <td>${this.escapeHtml(dc.country || 'Unknown')}</td>
         <td><span class="tier-badge tier${dc.tier}">Tier ${dc.tier}</span></td>
@@ -161,7 +163,7 @@ export class DataTableManager {
         <td>${dc.latitude?.toFixed(4)}, ${dc.longitude?.toFixed(4)}</td>
         <td>${this.escapeHtml(dc.name || 'DC')}</td>
         <td><span class="status-active">Active</span></td>
-      `;
+      `);
       tbody.appendChild(row);
     });
   }

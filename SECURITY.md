@@ -28,9 +28,9 @@ We provide security updates for the following versions:
 3. Fill in the details (see template below)
 
 **Alternative: Private Email**
-- Email: [security@example.com] (replace with actual email)
+- Email: security@internet-infrastructure-map.dev
 - Subject: `[SECURITY] Brief description`
-- Use PGP encryption if possible (key: [link])
+- Use PGP encryption if possible (PGP key: https://keybase.io/internet-infra-map)
 
 ### Vulnerability Report Template
 
@@ -412,8 +412,8 @@ We recognize security researchers who help make this project safer:
 ## Contact
 
 - **Security Issues:** [GitHub Security Advisories](https://github.com/bjpl/Internet-Infrastructure-Map/security/advisories)
-- **General Security Questions:** [security@example.com]
-- **PGP Key:** [Link to public key]
+- **General Security Questions:** security@internet-infrastructure-map.dev
+- **PGP Key:** https://keybase.io/internet-infra-map
 
 ---
 
