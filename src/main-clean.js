@@ -1823,8 +1823,41 @@ class CleanInfrastructureMap {
   }
   
   updateStats() {
-    document.getElementById('cable-count').textContent = this.stats.cables;
-    document.getElementById('datacenter-count').textContent = this.stats.datacenters;
+    // Update only elements that exist in the HTML
+    const cableCount = document.getElementById('cable-count');
+    if (cableCount) {
+      cableCount.textContent = this.stats.cables;
+    }
+
+    const datacenterCount = document.getElementById('datacenter-count');
+    if (datacenterCount) {
+      datacenterCount.textContent = this.stats.datacenters;
+    }
+
+    // These elements don't exist in current HTML, skip gracefully
+    const bgpRoutes = document.getElementById('bgp-routes');
+    const attackCount = document.getElementById('attack-count');
+    const fps = document.getElementById('fps');
+    const objectCount = document.getElementById('object-count');
+    const particleCount = document.getElementById('particle-count');
+
+    if (bgpRoutes) bgpRoutes.textContent = this.stats.bgpRoutes || 0;
+    if (attackCount) attackCount.textContent = this.stats.attacks || 0;
+    if (fps) fps.textContent = Math.round(this.stats.fps || 60);
+
+    if (objectCount || particleCount) {
+      const scene = this.globe.scene();
+      if (objectCount) objectCount.textContent = scene.children.length;
+      if (particleCount) {
+        let count = 0;
+        scene.traverse(child => {
+          if (child instanceof THREE.Points) {
+            count += child.geometry.attributes.position.count;
+          }
+        });
+        particleCount.textContent = count;
+      }
+    }
   }
 }
 
