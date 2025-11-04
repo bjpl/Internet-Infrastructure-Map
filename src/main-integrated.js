@@ -1110,7 +1110,11 @@ class IntegratedInfrastructureMap {
     // Update scene stats
     const scene = this.globeRenderer.getScene();
     if (scene) {
-      document.getElementById('object-count').textContent = scene.children.length;
+      // Only update if element exists
+      const objectCountElement = document.getElementById('object-count');
+      if (objectCountElement) {
+        objectCountElement.textContent = scene.children.length;
+      }
 
       // Count particles
       let particleCount = 0;
@@ -1119,7 +1123,11 @@ class IntegratedInfrastructureMap {
           particleCount += child.geometry.attributes.position.count;
         }
       });
-      document.getElementById('particle-count').textContent = particleCount;
+
+      const particleCountElement = document.getElementById('particle-count');
+      if (particleCountElement) {
+        particleCountElement.textContent = particleCount;
+      }
     }
 
     // Update data quality stats
