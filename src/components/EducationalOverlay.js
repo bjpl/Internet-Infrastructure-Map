@@ -1,6 +1,5 @@
 import knowledgeBaseService from '../services/knowledgeBaseService.js';
 import hljs from 'highlight.js';
-import DOMPurify from 'dompurify';
 
 /**
  * Educational Overlay Component
@@ -46,7 +45,7 @@ class EducationalOverlay {
   createTooltip() {
     const tooltip = document.createElement('div');
     tooltip.className = 'kb-tooltip hidden';
-    tooltip.innerHTML = DOMPurify.sanitize(`
+    tooltip.innerHTML = `
       <div class="kb-tooltip-content">
         <div class="kb-tooltip-header">
           <h4 class="kb-tooltip-title"></h4>
@@ -57,7 +56,7 @@ class EducationalOverlay {
           <button class="kb-tooltip-learn-more">Learn More</button>
         </div>
       </div>
-    `);
+    `;
 
     this.container.appendChild(tooltip);
     this.elements.tooltip = tooltip;
@@ -69,7 +68,7 @@ class EducationalOverlay {
   createSidebar() {
     const sidebar = document.createElement('div');
     sidebar.className = 'kb-sidebar hidden';
-    sidebar.innerHTML = DOMPurify.sanitize(`
+    sidebar.innerHTML = `
       <div class="kb-sidebar-header">
         <button class="kb-sidebar-back" title="Back" aria-label="Go back">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
@@ -127,7 +126,7 @@ class EducationalOverlay {
           </svg>
         </button>
       </div>
-    `);
+    `;
 
     this.container.appendChild(sidebar);
     this.elements.sidebar = sidebar;
@@ -139,7 +138,7 @@ class EducationalOverlay {
   createModal() {
     const modal = document.createElement('div');
     modal.className = 'kb-modal hidden';
-    modal.innerHTML = DOMPurify.sanitize(`
+    modal.innerHTML = `
       <div class="kb-modal-backdrop"></div>
       <div class="kb-modal-container">
         <div class="kb-modal-header">
@@ -148,7 +147,7 @@ class EducationalOverlay {
         </div>
         <div class="kb-modal-content"></div>
       </div>
-    `);
+    `;
 
     this.container.appendChild(modal);
     this.elements.modal = modal;
@@ -160,7 +159,7 @@ class EducationalOverlay {
   createFullscreen() {
     const fullscreen = document.createElement('div');
     fullscreen.className = 'kb-fullscreen hidden';
-    fullscreen.innerHTML = DOMPurify.sanitize(`
+    fullscreen.innerHTML = `
       <div class="kb-fullscreen-nav">
         <button class="kb-fullscreen-back" aria-label="Back">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -196,7 +195,7 @@ class EducationalOverlay {
           </div>
         </aside>
       </div>
-    `);
+    `;
 
     this.container.appendChild(fullscreen);
     this.elements.fullscreen = fullscreen;
@@ -299,14 +298,14 @@ class EducationalOverlay {
     tooltip.querySelector('.kb-tooltip-title').textContent = content.title;
 
     const body = tooltip.querySelector('.kb-tooltip-body');
-    body.innerHTML = DOMPurify.sanitize(`
+    body.innerHTML = `
       <p class="kb-tooltip-summary">${content.summary}</p>
       ${content.quickFacts && content.quickFacts.length > 0 ? `
         <ul class="kb-tooltip-facts">
           ${content.quickFacts.map(fact => `<li>${fact}</li>`).join('')}
         </ul>
       ` : ''}
-    `);
+    `;
 
     // Store article reference for "Learn More"
     if (content.learnMoreArticles && content.learnMoreArticles.length > 0) {
@@ -354,13 +353,10 @@ class EducationalOverlay {
 
     // Update article content
     const metaEl = this.elements.sidebar.querySelector('.kb-article-meta');
-    metaEl.innerHTML = DOMPurify.sanitize(this.renderArticleMeta(article));
+    metaEl.innerHTML = this.renderArticleMeta(article);
 
     const contentEl = this.elements.sidebar.querySelector('.kb-article-content');
-    contentEl.innerHTML = DOMPurify.sanitize(article.content.html, {
-      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'code', 'pre', 'blockquote', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td'],
-      ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id']
-    });
+    contentEl.innerHTML = article.content.html;
 
     // Add syntax highlighting
     contentEl.querySelectorAll('pre code').forEach(block => {
@@ -411,11 +407,11 @@ class EducationalOverlay {
     const container = this.elements.sidebar.querySelector('.kb-related-articles');
 
     if (related.length === 0) {
-      container.innerHTML = DOMPurify.sanitize('<p class="kb-no-results">No related articles found.</p>');
+      container.innerHTML = '<p class="kb-no-results">No related articles found.</p>';
       return;
     }
 
-    container.innerHTML = DOMPurify.sanitize(`
+    container.innerHTML = `
       <ul class="kb-related-list">
         ${related.map(article => `
           <li class="kb-related-item" data-article-id="${article.id}">
@@ -425,7 +421,7 @@ class EducationalOverlay {
           </li>
         `).join('')}
       </ul>
-    `);
+    `;
 
     // Add click handlers
     container.querySelectorAll('.kb-related-item').forEach(item => {
@@ -446,10 +442,7 @@ class EducationalOverlay {
 
     const modal = this.elements.modal;
     modal.querySelector('.kb-modal-title').textContent = article.title;
-    modal.querySelector('.kb-modal-content').innerHTML = DOMPurify.sanitize(article.content.html, {
-      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'code', 'pre', 'blockquote', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td'],
-      ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id']
-    });
+    modal.querySelector('.kb-modal-content').innerHTML = article.content.html;
 
     // Highlight code blocks
     modal.querySelectorAll('pre code').forEach(block => {
@@ -471,12 +464,9 @@ class EducationalOverlay {
     const fs = this.elements.fullscreen;
 
     // Update metadata
-    fs.querySelector('.kb-fullscreen-meta').innerHTML = DOMPurify.sanitize(this.renderArticleMeta(article));
+    fs.querySelector('.kb-fullscreen-meta').innerHTML = this.renderArticleMeta(article);
     fs.querySelector('.kb-fullscreen-title').textContent = article.title;
-    fs.querySelector('.kb-fullscreen-content').innerHTML = DOMPurify.sanitize(article.content.html, {
-      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'code', 'pre', 'blockquote', 'img', 'table', 'thead', 'tbody', 'tr', 'th', 'td'],
-      ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id']
-    });
+    fs.querySelector('.kb-fullscreen-content').innerHTML = article.content.html;
 
     // Generate table of contents
     this.generateTableOfContents(article);
@@ -502,7 +492,7 @@ class EducationalOverlay {
 
     const headings = content.querySelectorAll('h1, h2, h3');
     if (headings.length === 0) {
-      tocNav.innerHTML = DOMPurify.sanitize('<p>No sections</p>');
+      tocNav.innerHTML = '<p>No sections</p>';
       return;
     }
 
@@ -518,7 +508,7 @@ class EducationalOverlay {
       `;
     });
 
-    tocNav.innerHTML = DOMPurify.sanitize(tocItems.join(''));
+    tocNav.innerHTML = tocItems.join('');
   }
 
   /**
@@ -529,16 +519,16 @@ class EducationalOverlay {
     const container = this.elements.fullscreen.querySelector('.kb-fullscreen-related-list');
 
     if (related.length === 0) {
-      container.innerHTML = DOMPurify.sanitize('<p>No related articles</p>');
+      container.innerHTML = '<p>No related articles</p>';
       return;
     }
 
-    container.innerHTML = DOMPurify.sanitize(related.map(article => `
+    container.innerHTML = related.map(article => `
       <div class="kb-fullscreen-related-item" data-article-id="${article.id}">
         <h4>${article.title}</h4>
         <p>${article.description.substring(0, 80)}...</p>
       </div>
-    `).join(''));
+    `).join('');
 
     // Add click handlers
     container.querySelectorAll('.kb-fullscreen-related-item').forEach(item => {
@@ -573,11 +563,11 @@ class EducationalOverlay {
     const container = this.elements.sidebar.querySelector('.kb-search-results');
 
     if (results.length === 0) {
-      container.innerHTML = DOMPurify.sanitize('<p class="kb-no-results">No results found.</p>');
+      container.innerHTML = '<p class="kb-no-results">No results found.</p>';
       return;
     }
 
-    container.innerHTML = DOMPurify.sanitize(`
+    container.innerHTML = `
       <ul class="kb-search-result-list">
         ${results.map(({ article, snippet, score }) => `
           <li class="kb-search-result" data-article-id="${article.id}">
@@ -590,7 +580,7 @@ class EducationalOverlay {
           </li>
         `).join('')}
       </ul>
-    `);
+    `;
 
     // Add click handlers
     container.querySelectorAll('.kb-search-result').forEach(item => {

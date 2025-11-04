@@ -18,7 +18,6 @@ import { DataManager } from './dataManager.js';
 import { GlobeRenderer } from './components/GlobeRenderer.js';
 import { FilterControls } from './components/FilterControls.js';
 import { DataTableManager } from './components/DataTableManager.js';
-import DOMPurify from 'dompurify';
 import { EducationalOverlay } from './components/EducationalOverlay.js';
 
 class UnifiedInfrastructureMap {
@@ -695,59 +694,43 @@ class UnifiedInfrastructureMap {
    * Update statistics display
    */
   updateStats() {
-    // Update only elements that exist in the HTML
-    const cableCount = document.getElementById('cable-count');
-    const datacenterCount = document.getElementById('datacenter-count');
+    const updates = [
+      ['cable-count', this.stats.cables],
+      ['datacenter-count', this.stats.datacenters],
+      ['bgp-routes', this.stats.bgpRoutes],
+      ['attack-count', this.stats.attacks],
+      ['fps', Math.round(this.stats.fps)]
+    ];
 
-    if (cableCount) {
-      const current = parseInt(cableCount.textContent.replace(/,/g, '')) || 0;
-      if (current !== this.stats.cables) {
-        gsap.to({ value: current }, {
-          value: this.stats.cables,
-          duration: 0.5,
-          onUpdate: function() {
-            cableCount.textContent = Math.round(this.targets()[0].value).toLocaleString();
-          }
-        });
+    updates.forEach(([id, value]) => {
+      const element = document.getElementById(id);
+      if (element) {
+        const current = parseInt(element.textContent.replace(/,/g, '')) || 0;
+        if (current !== value) {
+          gsap.to({ value: current }, {
+            value: value,
+            duration: 0.5,
+            onUpdate: function() {
+              element.textContent = Math.round(this.targets()[0].value).toLocaleString();
+            }
+          });
+        }
       }
-    }
+    });
 
-    if (datacenterCount) {
-      const current = parseInt(datacenterCount.textContent.replace(/,/g, '')) || 0;
-      if (current !== this.stats.datacenters) {
-        gsap.to({ value: current }, {
-          value: this.stats.datacenters,
-          duration: 0.5,
-          onUpdate: function() {
-            datacenterCount.textContent = Math.round(this.targets()[0].value).toLocaleString();
-          }
-        });
-      }
-    }
+    // Update scene stats
+    const scene = this.globeRenderer.getScene();
+    if (scene) {
+      document.getElementById('object-count').textContent = scene.children.length;
 
-    // These elements don't exist in current HTML, skip gracefully
-    const bgpRoutes = document.getElementById('bgp-routes');
-    const attackCount = document.getElementById('attack-count');
-    const fps = document.getElementById('fps');
-    const objectCount = document.getElementById('object-count');
-    const particleCount = document.getElementById('particle-count');
-
-    if (bgpRoutes) bgpRoutes.textContent = this.stats.bgpRoutes.toLocaleString();
-    if (attackCount) attackCount.textContent = this.stats.attacks;
-    if (fps) fps.textContent = Math.round(this.stats.fps);
-
-    if (objectCount || particleCount) {
-      const scene = this.globeRenderer.getScene();
-      if (objectCount) objectCount.textContent = scene.children.length;
-      if (particleCount) {
-        let count = 0;
-        scene.traverse(child => {
-          if (child instanceof THREE.Points) {
-            count += child.geometry.attributes.position.count;
-          }
-        });
-        particleCount.textContent = count;
-      }
+      // Count particles
+      let particleCount = 0;
+      scene.traverse(child => {
+        if (child instanceof THREE.Points) {
+          particleCount += child.geometry.attributes.position.count;
+        }
+      });
+      document.getElementById('particle-count').textContent = particleCount;
     }
   }
 

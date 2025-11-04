@@ -582,41 +582,18 @@ class InternetInfrastructureMap {
   }
   
   updateStats() {
-    // Update only elements that exist in the HTML
-    const cableCount = document.getElementById('cable-count');
-    if (cableCount) {
-      cableCount.textContent = this.stats.cables.toLocaleString();
-    }
-
-    const datacenterCount = document.getElementById('datacenter-count');
-    if (datacenterCount) {
-      datacenterCount.textContent = this.stats.datacenters.toLocaleString();
-    }
-
-    // These elements don't exist in current HTML, skip gracefully
-    const bgpRoutes = document.getElementById('bgp-routes');
-    const attackCount = document.getElementById('attack-count');
-    const fps = document.getElementById('fps');
-    const objectCount = document.getElementById('object-count');
-    const particleCount = document.getElementById('particle-count');
-
-    if (bgpRoutes) bgpRoutes.textContent = this.stats.bgpRoutes.toLocaleString();
-    if (attackCount) attackCount.textContent = this.stats.attacks.toLocaleString();
-    if (fps) fps.textContent = Math.round(this.stats.fps).toLocaleString();
-
-    if (objectCount || particleCount) {
-      const scene = this.globe.scene();
-      if (objectCount) objectCount.textContent = scene.children.length.toLocaleString();
-      if (particleCount) {
-        let count = 0;
-        scene.traverse(child => {
-          if (child instanceof THREE.Points) {
-            count += child.geometry.attributes.position.count;
-          }
-        });
-        particleCount.textContent = count.toLocaleString();
-      }
-    }
+    const updates = [
+      ['cable-count', this.stats.cables],
+      ['datacenter-count', this.stats.datacenters],
+      ['bgp-routes', this.stats.bgpRoutes],
+      ['attack-count', this.stats.attacks],
+      ['fps', Math.round(this.stats.fps)]
+    ];
+    
+    updates.forEach(([id, value]) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value.toLocaleString();
+    });
   }
   
   setupEventListeners() {

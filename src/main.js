@@ -3,7 +3,6 @@ import * as THREE from 'three';
 import * as d3 from 'd3';
 import gsap from 'gsap';
 import { DataManager } from './dataManager.js';
-import DOMPurify from 'dompurify';
 
 class InternetInfrastructureMap {
   constructor() {
@@ -365,33 +364,15 @@ class InternetInfrastructureMap {
   }
   
   updateStats() {
-    // Update only elements that exist in the HTML
-    const cableCount = document.getElementById('cable-count');
-    const datacenterCount = document.getElementById('datacenter-count');
-
-    if (cableCount) {
-      cableCount.textContent = this.stats.cables.toLocaleString();
-    }
-    if (datacenterCount) {
-      datacenterCount.textContent = this.stats.datacenters.toLocaleString();
-    }
-
-    // These elements don't exist in current HTML, skip gracefully
-    const bgpRoutes = document.getElementById('bgp-routes');
-    const attackCount = document.getElementById('attack-count');
-    const fps = document.getElementById('fps');
-    const objectCount = document.getElementById('object-count');
-    const particleCount = document.getElementById('particle-count');
-
-    if (bgpRoutes) bgpRoutes.textContent = this.stats.bgpRoutes.toLocaleString();
-    if (attackCount) attackCount.textContent = this.stats.attacks;
-    if (fps) fps.textContent = Math.round(this.stats.fps);
-
-    if (objectCount || particleCount) {
-      const scene = this.globe.scene();
-      if (objectCount) objectCount.textContent = scene.children.length;
-      if (particleCount) particleCount.textContent = this.stats.particles;
-    }
+    document.getElementById('cable-count').textContent = this.stats.cables.toLocaleString();
+    document.getElementById('datacenter-count').textContent = this.stats.datacenters.toLocaleString();
+    document.getElementById('bgp-routes').textContent = this.stats.bgpRoutes.toLocaleString();
+    document.getElementById('attack-count').textContent = this.stats.attacks;
+    document.getElementById('fps').textContent = Math.round(this.stats.fps);
+    
+    const scene = this.globe.scene();
+    document.getElementById('object-count').textContent = scene.children.length;
+    document.getElementById('particle-count').textContent = this.stats.particles;
   }
   
   setupEventListeners() {
@@ -458,15 +439,14 @@ class InternetInfrastructureMap {
     const content = document.getElementById('info-content');
     
     panel.classList.remove('hidden');
-    const errorMsg = DOMPurify.sanitize(error.message || 'Unknown error');
-    content.innerHTML = DOMPurify.sanitize(`
+    content.innerHTML = `
       <div style="color: #ff3366;">
-        Some data sources are currently unavailable.
+        Some data sources are currently unavailable. 
         Showing cached/estimated data where possible.
         <br><br>
-        Error: ${errorMsg}
+        Error: ${error.message}
       </div>
-    `);
+    `;
   }
   
   onWindowResize() {

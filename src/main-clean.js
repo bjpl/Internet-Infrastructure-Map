@@ -2,7 +2,6 @@ import Globe from 'globe.gl';
 import * as THREE from 'three';
 import * as d3 from 'd3';
 import { DataManager } from './dataManager.js';
-import DOMPurify from 'dompurify';
 // Removed custom cable renderer - using globe.gl paths instead
 
 class CleanInfrastructureMap {
@@ -61,7 +60,7 @@ class CleanInfrastructureMap {
       // Simplify loading screen
       const content = loadingScreen.querySelector('.loading-content');
       if (content) {
-        content.innerHTML = DOMPurify.sanitize(`
+        content.innerHTML = `
           <div style="text-align: center;">
             <div style="
               width: 60px;
@@ -1464,18 +1463,15 @@ class CleanInfrastructureMap {
           );
           
           const row = document.createElement('tr');
-          const cableName = DOMPurify.sanitize(cable.name || 'Unknown Cable');
-          const loc1 = DOMPurify.sanitize(cable.landing_point_1.location || `${cable.landing_point_1.latitude.toFixed(1)}°, ${cable.landing_point_1.longitude.toFixed(1)}°`);
-          const loc2 = DOMPurify.sanitize(cable.landing_point_2.location || `${cable.landing_point_2.latitude.toFixed(1)}°, ${cable.landing_point_2.longitude.toFixed(1)}°`);
-          row.innerHTML = DOMPurify.sanitize(`
-            <td>${cableName}</td>
+          row.innerHTML = `
+            <td>${cable.name || 'Unknown Cable'}</td>
             <td>${cable.capacity_tbps ? cable.capacity_tbps.toFixed(1) : 'N/A'}</td>
             <td>${Math.round(distance)}</td>
-            <td>${loc1}</td>
-            <td>${loc2}</td>
+            <td>${cable.landing_point_1.location || `${cable.landing_point_1.latitude.toFixed(1)}°, ${cable.landing_point_1.longitude.toFixed(1)}°`}</td>
+            <td>${cable.landing_point_2.location || `${cable.landing_point_2.latitude.toFixed(1)}°, ${cable.landing_point_2.longitude.toFixed(1)}°`}</td>
             <td class="status-${cable.status || 'active'}">${(cable.status || 'Active').toUpperCase()}</td>
             <td class="accuracy-${cable.data_accuracy === 'live' ? 'live' : 'estimated'}">${cable.data_accuracy === 'live' ? 'Live' : 'Estimated'}</td>
-          `);
+          `;
           tbody.appendChild(row);
         });
       }
@@ -1561,19 +1557,15 @@ class CleanInfrastructureMap {
       // Create rows
       filtered.forEach(dc => {
         const row = document.createElement('tr');
-        const city = DOMPurify.sanitize(dc.city || 'Unknown');
-        const country = DOMPurify.sanitize(dc.country || 'Unknown');
-        const provider = DOMPurify.sanitize(dc.provider || 'N/A');
-        const name = DOMPurify.sanitize(dc.name || 'DC');
-        row.innerHTML = DOMPurify.sanitize(`
-          <td>${city}</td>
-          <td>${country}</td>
+        row.innerHTML = `
+          <td>${dc.city || 'Unknown'}</td>
+          <td>${dc.country || 'Unknown'}</td>
           <td><span class="tier-badge tier${dc.tier}">Tier ${dc.tier}</span></td>
-          <td>${provider}</td>
+          <td>${dc.provider || 'N/A'}</td>
           <td>${dc.latitude?.toFixed(4)}, ${dc.longitude?.toFixed(4)}</td>
-          <td>${name}</td>
+          <td>${dc.name || 'DC'}</td>
           <td><span class="status-active">Active</span></td>
-        `);
+        `;
         datacenterTbody.appendChild(row);
       });
     };
@@ -1823,41 +1815,8 @@ class CleanInfrastructureMap {
   }
   
   updateStats() {
-    // Update only elements that exist in the HTML
-    const cableCount = document.getElementById('cable-count');
-    if (cableCount) {
-      cableCount.textContent = this.stats.cables;
-    }
-
-    const datacenterCount = document.getElementById('datacenter-count');
-    if (datacenterCount) {
-      datacenterCount.textContent = this.stats.datacenters;
-    }
-
-    // These elements don't exist in current HTML, skip gracefully
-    const bgpRoutes = document.getElementById('bgp-routes');
-    const attackCount = document.getElementById('attack-count');
-    const fps = document.getElementById('fps');
-    const objectCount = document.getElementById('object-count');
-    const particleCount = document.getElementById('particle-count');
-
-    if (bgpRoutes) bgpRoutes.textContent = this.stats.bgpRoutes || 0;
-    if (attackCount) attackCount.textContent = this.stats.attacks || 0;
-    if (fps) fps.textContent = Math.round(this.stats.fps || 60);
-
-    if (objectCount || particleCount) {
-      const scene = this.globe.scene();
-      if (objectCount) objectCount.textContent = scene.children.length;
-      if (particleCount) {
-        let count = 0;
-        scene.traverse(child => {
-          if (child instanceof THREE.Points) {
-            count += child.geometry.attributes.position.count;
-          }
-        });
-        particleCount.textContent = count;
-      }
-    }
+    document.getElementById('cable-count').textContent = this.stats.cables;
+    document.getElementById('datacenter-count').textContent = this.stats.datacenters;
   }
 }
 
