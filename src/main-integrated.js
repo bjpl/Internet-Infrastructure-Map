@@ -251,12 +251,30 @@ class IntegratedInfrastructureMap {
       this.updateLoadingStatus('Loading submarine cable data...', 30 + (currentStep / totalSteps) * 40);
 
       const cablesResult = await this.dataOrchestrator.getCables();
-      this.data.cables = cablesResult;
-      console.log(`[IntegratedMap] Loaded ${cablesResult.data.length} cables from ${cablesResult.metadata.source} (confidence: ${cablesResult.metadata.confidence})`);
+
+      // DEBUG: Check cable data structure
+      console.log('[DEBUG] Cable data received:', {
+        hasData: !!cablesResult,
+        hasDataArray: !!cablesResult?.data,
+        dataLength: cablesResult?.data?.length || 0,
+        source: cablesResult?.metadata?.source,
+        confidence: cablesResult?.metadata?.confidence,
+        firstCable: cablesResult?.data?.[0]
+      });
+
+      // Ensure we have valid cable data
+      if (!cablesResult || !cablesResult.data || cablesResult.data.length === 0) {
+        console.warn('[IntegratedMap] No cable data available, using empty array');
+        this.data.cables = { data: [], metadata: { source: 'none', confidence: 0 } };
+      } else {
+        this.data.cables = cablesResult;
+        console.log(`[IntegratedMap] Loaded ${cablesResult.data.length} cables from ${cablesResult.metadata.source} (confidence: ${cablesResult.metadata.confidence})`);
+      }
 
       currentStep++;
 
       // Apply initial filters and render progressively
+      console.log('[DEBUG] Calling onFilterChange with cables:', this.data.cables.data.length);
       this.onFilterChange(this.filterControls.getFilters());
 
       // === LOAD DATA CENTERS ===
@@ -320,9 +338,22 @@ class IntegratedInfrastructureMap {
    * @param {Object} filters - Current filter state
    */
   onFilterChange(filters) {
+    // DEBUG: Check incoming data
+    console.log('[DEBUG] onFilterChange called:', {
+      hasCableData: !!this.data.cables,
+      cableDataLength: this.data.cables?.data?.length || 0,
+      filters: filters
+    });
+
     // Apply filters to cable data
     const filtered = this.filterControls.applyFilters(this.data.cables.data);
     this.data.filteredCables = filtered;
+
+    console.log('[DEBUG] Filtered cables:', {
+      originalCount: this.data.cables?.data?.length || 0,
+      filteredCount: filtered.length,
+      firstFiltered: filtered[0]
+    });
 
     // Render cables progressively to avoid blocking UI
     this.renderCablesProgressive(filtered);
@@ -345,12 +376,38 @@ class IntegratedInfrastructureMap {
    * @param {Array} cables - Filtered cables to render
    */
   renderCablesProgressive(cables) {
+    console.log('[DEBUG] renderCablesProgressive called with', cables.length, 'cables');
+
     const globe = this.globeRenderer.getGlobe();
+
+    if (!globe) {
+      console.error('[ERROR] Globe renderer not available!');
+      const debugDiv = document.getElementById('debug-info') || this.createDebugDiv();
+      debugDiv.innerHTML = `
+        <div style="background: rgba(255,0,0,0.2); padding: 10px; border: 1px solid red;">
+          ✗ ERROR: Globe not initialized
+        </div>
+      `;
+      return;
+    }
+
+    console.log('[DEBUG] Globe object:', {
+      hasGlobe: !!globe,
+      hasArcsData: typeof globe.arcsData === 'function',
+      globeType: globe.constructor.name
+    });
 
     // === INITIAL BATCH ===
     // Render first 100 cables immediately for instant feedback
     const initialBatch = cables.slice(0, this.state.progressive.initialBatch);
+    console.log('[DEBUG] Initial batch size:', initialBatch.length);
+
     const cableArcs = this.formatCableArcs(initialBatch);
+    console.log('[DEBUG] Formatted cable arcs:', {
+      count: cableArcs.length,
+      firstArc: cableArcs[0],
+      sample: cableArcs.slice(0, 3)
+    });
 
     // Configure globe.gl arc rendering
     globe
@@ -367,6 +424,16 @@ class IntegratedInfrastructureMap {
       .arcCurveResolution(64)
       .arcsTransitionDuration(1000)
       .arcLabel(arc => this.createCableTooltip(arc));
+
+    console.log('[DEBUG] Globe arcsData set with', cableArcs.length, 'arcs');
+
+    // Visual feedback in UI
+    const debugDiv = document.getElementById('debug-info') || this.createDebugDiv();
+    debugDiv.innerHTML = `
+      <div style="background: rgba(0,255,0,0.2); padding: 10px; border: 1px solid lime;">
+        ✓ CABLES RENDERED: ${cableArcs.length} arcs displayed
+      </div>
+    `;
 
     // === VISUAL EFFECTS ===
     // Add particle glow to high-capacity cables
@@ -422,7 +489,15 @@ class IntegratedInfrastructureMap {
    * @returns {Array} Arc objects for globe.gl
    */
   formatCableArcs(cables) {
-    return cables.map(cable => {
+    console.log('[DEBUG] formatCableArcs processing', cables.length, 'cables');
+
+    const arcs = cables.map(cable => {
+      // Validate cable structure
+      if (!cable.landing_point_1 || !cable.landing_point_2) {
+        console.warn('[WARN] Cable missing landing points:', cable);
+        return null;
+      }
+
       // Calculate importance score (0-1) based on capacity, distance, status
       const importance = this.calculateImportance(cable);
 
@@ -477,6 +552,28 @@ class IntegratedInfrastructureMap {
         importance: importance
       };
     }).filter(arc => arc !== null);
+
+    console.log('[DEBUG] formatCableArcs returning', arcs.length, 'valid arcs');
+    return arcs;
+  }
+
+  /**
+   * Create debug info div for visual feedback
+   */
+  createDebugDiv() {
+    const div = document.createElement('div');
+    div.id = 'debug-info';
+    div.style.cssText = `
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 10000;
+      font-family: monospace;
+      font-size: 12px;
+      max-width: 300px;
+    `;
+    document.body.appendChild(div);
+    return div;
   }
 
   /**
