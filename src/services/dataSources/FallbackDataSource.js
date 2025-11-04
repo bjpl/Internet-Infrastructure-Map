@@ -7,12 +7,15 @@
  * @module services/dataSources/FallbackDataSource
  */
 
+import { DataManager } from '../../dataManager.js';
+
 /**
  * Fallback Data Source
  * Generates estimated data and provides static fallback datasets
  */
 export class FallbackDataSource {
   constructor() {
+    this.dataManager = new DataManager();
     this.staticData = this.loadStaticData();
     this.estimationModels = this.initializeEstimationModels();
   }
@@ -202,79 +205,66 @@ export class FallbackDataSource {
 
   /**
    * Generate static cable dataset
+   * Uses comprehensive 552-cable dataset from DataManager
    * @private
-   * @returns {Array} Static cables
+   * @returns {Array} Static cables (552 cables: 62 major + 490 estimated)
    */
   generateStaticCables() {
-    const majorRoutes = [
-      // Trans-Atlantic Routes
-      { name: 'TAT-14', start: { city: 'New York', lat: 40.7128, lng: -74.0060 }, end: { city: 'London', lat: 51.5074, lng: -0.1278 }, capacity: 150 },
-      { name: 'Marea', start: { city: 'Virginia Beach', lat: 36.8529, lng: -75.9780 }, end: { city: 'Bilbao', lat: 43.2630, lng: -2.9350 }, capacity: 200 },
-      { name: 'Havfrue', start: { city: 'New Jersey', lat: 40.0583, lng: -74.4057 }, end: { city: 'Denmark', lat: 56.2639, lng: 9.5018 }, capacity: 180 },
+    // Get the comprehensive cable dataset from DataManager
+    const cableData = this.dataManager.generateSubmarineCables();
 
-      // Trans-Pacific Routes
-      { name: 'FASTER', start: { city: 'Los Angeles', lat: 34.0522, lng: -118.2437 }, end: { city: 'Tokyo', lat: 35.6762, lng: 139.6503 }, capacity: 60 },
-      { name: 'JUPITER', start: { city: 'Los Angeles', lat: 34.0522, lng: -118.2437 }, end: { city: 'Chikura', lat: 35.1333, lng: 140.0833 }, capacity: 120 },
-      { name: 'Unity', start: { city: 'Los Angeles', lat: 34.0522, lng: -118.2437 }, end: { city: 'Chikura', lat: 35.1333, lng: 140.0833 }, capacity: 250 },
-
-      // Asia-Europe Routes
-      { name: 'SEA-ME-WE 5', start: { city: 'Singapore', lat: 1.3521, lng: 103.8198 }, end: { city: 'France', lat: 43.5528, lng: 5.3667 }, capacity: 30 },
-      { name: 'AAE-1', start: { city: 'Singapore', lat: 1.3521, lng: 103.8198 }, end: { city: 'Marseille', lat: 43.2965, lng: 5.3698 }, capacity: 40 },
-
-      // Intra-Asia Routes
-      { name: 'Asia-Pacific Gateway', start: { city: 'Singapore', lat: 1.3521, lng: 103.8198 }, end: { city: 'Hong Kong', lat: 22.3193, lng: 114.1694 }, capacity: 55 },
-      { name: 'SJC2', start: { city: 'Hong Kong', lat: 22.3193, lng: 114.1694 }, end: { city: 'Tokyo', lat: 35.6762, lng: 139.6503 }, capacity: 144 },
-
-      // South America
-      { name: 'SACS', start: { city: 'Fortaleza', lat: -3.7327, lng: -38.5270 }, end: { city: 'Luanda', lat: -8.8368, lng: 13.2343 }, capacity: 40 },
-      { name: 'Monet', start: { city: 'Florida', lat: 27.6648, lng: -81.5158 }, end: { city: 'Santos', lat: -23.9608, lng: -46.3333 }, capacity: 64 }
-    ];
-
-    return majorRoutes.map((route, index) => ({
-      id: `cable-static-${index}`,
+    return cableData.map((cable, index) => ({
+      id: `cable-${index}`,
       type: 'submarine-cable',
-      name: route.name,
-      owner: 'Multiple Carriers',
-      status: 'active',
+      name: cable.name,
+      owner: cable.owner || 'Unknown Operator',
+      status: cable.status || 'active',
 
       // Format matching main-integrated.js expectations
       landing_point_1: {
-        location: route.start.city,
-        latitude: route.start.lat,
-        longitude: route.start.lng
+        location: cable.landing_point_1.location,
+        latitude: cable.landing_point_1.latitude,
+        longitude: cable.landing_point_1.longitude
       },
       landing_point_2: {
-        location: route.end.city,
-        latitude: route.end.lat,
-        longitude: route.end.lng
+        location: cable.landing_point_2.location,
+        latitude: cable.landing_point_2.latitude,
+        longitude: cable.landing_point_2.longitude
       },
 
       // Legacy format for compatibility
       landingPoints: [
-        { name: route.start.city, location: { lat: route.start.lat, lng: route.start.lng } },
-        { name: route.end.city, location: { lat: route.end.lat, lng: route.end.lng } }
+        {
+          name: cable.landing_point_1.location,
+          location: { lat: cable.landing_point_1.latitude, lng: cable.landing_point_1.longitude }
+        },
+        {
+          name: cable.landing_point_2.location,
+          location: { lat: cable.landing_point_2.latitude, lng: cable.landing_point_2.longitude }
+        }
       ],
 
       coordinates: this.estimateCablePath(
-        { location: { lat: route.start.lat, lng: route.start.lng } },
-        { location: { lat: route.end.lat, lng: route.end.lng } }
+        { location: { lat: cable.landing_point_1.latitude, lng: cable.landing_point_1.longitude } },
+        { location: { lat: cable.landing_point_2.latitude, lng: cable.landing_point_2.longitude } }
       ),
 
       length_km: this.calculateDistance(
-        { lat: route.start.lat, lng: route.start.lng },
-        { lat: route.end.lat, lng: route.end.lng }
+        { lat: cable.landing_point_1.latitude, lng: cable.landing_point_1.longitude },
+        { lat: cable.landing_point_2.latitude, lng: cable.landing_point_2.longitude }
       ),
-      capacity_tbps: route.capacity || 60,
+      capacity_tbps: cable.capacity_tbps || 60,
 
       specs: {
         length: this.calculateDistance(
-          { lat: route.start.lat, lng: route.start.lng },
-          { lat: route.end.lat, lng: route.end.lng }
+          { lat: cable.landing_point_1.latitude, lng: cable.landing_point_1.longitude },
+          { lat: cable.landing_point_2.latitude, lng: cable.landing_point_2.longitude }
         ),
-        capacity: 60000 // 60 Tbps estimate
+        capacity: (cable.capacity_tbps || 60) * 1000 // Convert Tbps to Gbps
       },
 
-      data_accuracy: 'estimated'
+      year: cable.year || null,
+      data_accuracy: cable.data_accuracy || 'estimated'
     }));
   }
 
@@ -473,11 +463,12 @@ export class FallbackDataSource {
       service: 'fallback',
       status: 'always-available',
       staticDatasets: {
-        cables: this.staticData.cables.length,
-        ixps: this.staticData.ixps.length,
-        datacenters: this.staticData.datacenters.length
+        cables: this.staticData.cables?.length || 0,
+        ixps: this.staticData.ixps?.length || 0,
+        datacenters: this.staticData.datacenters?.length || 0
       },
-      estimationModels: Object.keys(this.estimationModels).length
+      estimationModels: Object.keys(this.estimationModels).length,
+      dataSource: 'comprehensive-dataset-from-datamanager'
     };
   }
 }
