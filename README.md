@@ -2,11 +2,19 @@
 
 > **An educational 3D visualization of global internet infrastructure with live data, intelligent fallbacks, and integrated knowledge base**
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Status](https://img.shields.io/badge/status-live-green.svg)
-![Data Quality](https://img.shields.io/badge/data%20quality-85%25-brightgreen.svg)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/bjpl/Internet-Infrastructure-Map)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/status-live-green.svg)](https://bjpl.github.io/Internet-Infrastructure-Map/)
+[![Data Quality](https://img.shields.io/badge/data%20quality-85%25-brightgreen.svg)](docs/guides/DATA_QUALITY_GUIDE.md)
+[![Vite](https://img.shields.io/badge/Vite-5.1-purple.svg)](https://vitejs.dev/)
+[![Three.js](https://img.shields.io/badge/Three.js-0.150-black.svg)](https://threejs.org/)
+[![D3](https://img.shields.io/badge/D3-7.9-orange.svg)](https://d3js.org/)
+
+**Status**: Active Production | **Version**: 1.0.0 | **Stack**: React + TypeScript, Vite 5.1, D3.js 7.9, Three.js 0.150, Globe.GL 2.26
 
 **Live Demo:** [https://bjpl.github.io/Internet-Infrastructure-Map/](https://bjpl.github.io/Internet-Infrastructure-Map/)
+
+Interactive 3D globe visualization featuring 100+ real submarine cables from TeleGeography, 500+ data centers from PeeringDB, integrated 200+ article knowledge base, and real-time data quality monitoring with intelligent API fallback chain.
 
 ---
 
